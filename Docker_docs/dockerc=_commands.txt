@@ -1,0 +1,133 @@
+docker run -itd --name <name of the container> --hostname <inside name of the host> -p 
+ --network host <image name>
+
+sudo docker build -f /home/ec2-user/pct/tomcat.Dockerfile -t tomcat .
+
+watch -n 1 ls /var/lib/docker/volumes/vol1
+ifconfg -a
+docker run --rm -itd --name 
+docker rename <old container name> <new container name>
+
+docker network ls
+docker network commands
+docker network {
+                connect ------ connect container to a network
+                create  ------ create container to a network
+                disconnect --- disconnect container to a network
+                inspect  ----- dislay detailed information on one or more network
+                ls ----------- list network
+                prune -------- remove all unused network
+                rm ----------- remove one or more network
+}
+docker network create <nwtwork name>
+docker network ls
+
+
+
+docker inspect <image name>
+#####docker volumes############
+docker volumes ls
+docker run --rm -itd -v vol1:/var/www/html -p 9000:9000 sreeharshav/ubuntu_with_tools:16.04v2 
+################
+docker run -itd --name <container name> -p 8081:80 -v <volume name>:<attach which folder in con> <image name>
+docker run -itd --name centos-23c1n -p 7938:80  -v cenos-vol:/root cent-custo-img
+#############
+I=100
+while [ $I -lt 1000]
+do
+docker run -itd --name NGINX$I -p 8$I:80 -v cenos-vol:/usr/share/nginx/html sreeharshav/rollingupdate:v3
+I=$(( $I +100 ))
+done
+
+
+#########
+docker compose
+docker-compose ##### to compose the docker image 
+1. build the images , network volume, whole applivation deploy
+2. docker-commands is not recommended for prod
+3.docker compose file similar as manifest file in kubernetes
+
+version: "3"
+
+services:
+  vote:
+    build: ./vote
+    command: python app.py
+    volumes:
+     - ./vote:/app
+    ports:
+      - "5000:80"
+    networks:
+      - front-tier
+      - back-tier
+
+  result:
+    build: ./result
+    command: nodemon server.js
+    volumes:
+      - ./result:/app
+    ports:
+      - "5001:80"
+      - "5858:5858"
+    networks:
+      - front-tier
+      - back-tier
+
+  worker:
+    build:
+      context: ./worker
+    depends_on:
+      - "redis"
+      - "db"
+    networks:
+      - back-tier
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports: ["6379"]
+    networks:
+      - back-tier
+
+  db:
+    image: postgres:9.4
+    container_name: db
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+    networks:
+      - back-tier
+
+volumes:
+  db-data:
+
+networks:
+  front-tier:
+  back-tier:
+
+#########################
+docker swarm
+
+docker swarm init  ###### to start docker swarm
+docker service create \
+  --name=viz \
+  --publish=9080:8080/tcp \
+  --constraint=node.role==manager \
+  --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+  dockersamples/visualizer
+
+docker service create \
+  --name=viz \
+  --publish=9090:8080/tcp \
+  --constraint=node.role==manager \
+  --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+  alexellis2/visualizer-arm:latest
+
+
+ docker service scale <service name>=3
+
+ #################
+docker swarm join-token worker # generate a token in master and to join the worker
+

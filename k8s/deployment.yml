@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: myapp-deployment
+ lables:
+    app: httpd
+    type: httpd-frontend
+spec:
+  template:
+    metadata:
+      name: httpd-pod
+      labels:
+        app: myapp
+        type: front-end
+    spec:
+      containers:
+      - name: httpd-containers
+        image: httpd:3.4-alpine
+
+    
+  replicas: 3
+  selector:
+     matchLabels:
+         type: httpd-front-end
+-------------------------------------
+  kubectl get pods --namespace=dev
+  kubectl get pods --namespace=default 
+  kubectl get pods --namespace=prod
+  kubect config set-context $(kubectl config current-context) --namespace=dev

@@ -1,0 +1,15 @@
+apiversion: v1
+
+kind: pod
+metadata: 
+    name: my-app-pod
+    lable: 
+        app: my-app
+
+spec:
+    
+
+#kubectl run nginx --image=nginx --generator=run-pod/v1
+#kubectl describe pod image<image -id>
+kubectl run redis --image=redis --generator=run-pod/v1
+# kubectl run redis --image=redis --restart=Never --dry-run -o yaml > pod.yml
